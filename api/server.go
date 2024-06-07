@@ -79,6 +79,22 @@ func (server *Server) setupRouter() {
 	authRoutes.DELETE("/wishlists/:id", server.deleteWishlist)
 	authRoutes.GET("/wishlists/user", server.getWishlistByUser)
 
+	//order items
+	authRoutes.GET("/order_items", server.listOrderItems)
+	router.GET("/order_items/:id", server.getOrderItem)
+	authRoutes.GET("/order_items/order/:id", server.getOrderItemsByOrderId)
+
+	//reviews
+	authRoutes.POST("/reviews", server.createReview)
+	router.GET("/reviews/:id", server.getReview)
+	router.GET("/reviews", server.listReviews)
+	router.GET("/reviews/product/:id", server.getReviewsByProductId)
+	authRoutes.DELETE("/reviews/:id", server.deleteReview)
+
+	// reset password
+	authRoutes.POST("/users/request-password-reset", server.requestPasswordReset)
+	authRoutes.POST("/users/reset-password", server.resetPassword)
+
 	server.router = router
 }
 

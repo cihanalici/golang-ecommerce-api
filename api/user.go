@@ -2,11 +2,13 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
 
 	db "github.com/cihanalici/api/db/sqlc"
+	"github.com/cihanalici/api/token"
 	"github.com/cihanalici/api/util"
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
@@ -96,9 +98,13 @@ func (server *Server) createUser(ctx *gin.Context) {
 			}
 		}
 
+		fmt.Println(err)
+
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
+
+	fmt.Println(user)
 
 	rsp := userResponse(user)
 	ctx.JSON(http.StatusOK, rsp)
@@ -277,4 +283,121 @@ func (server *Server) deleteUser(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"status": "ok"})
+}
+
+// reset password işlemleri
+
+type requestPasswordResetRequest struct {
+	Email string `json:"email" binding:"required,email"`
+}
+
+type resetPasswordRequest struct {
+	Token       string `json:"token" binding:"required"`
+	NewPassword string `json:"new_password" binding:"required,min=6"`
+}
+
+func (server *Server) requestPasswordReset(ctx *gin.Context) {
+	var req requestPasswordResetRequest
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	user, err := server.store.GetUserByEmail(ctx, req.Email)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	token, err := token.GenerateResetToken()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	err = server.storeResetToken(ctx, user.ID, token)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	err = util.SendResetEmail(req.Email, token)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "password reset email sent"})
+}
+
+func (server *Server) storeResetToken(ctx *gin.Context, userID int32, token string) error {
+	arg := db.CreatePasswordResetParams{
+		UserID:     userID,
+		ResetToken: token,
+		ExpiresAt:  time.Now().Add(time.Hour * 1),
+	}
+
+	_, err := server.store.CreatePasswordReset(ctx, arg)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (server *Server) resetPassword(ctx *gin.Context) {
+	var req resetPasswordRequest
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	// bu alınan tokeni int32'ye çevirip userId'e atamamız gerekiyor
+	userIdByToken, _ := ctx.Get("userId")
+	userId, _ := userIdByToken.(int32)
+
+	fmt.Println(userId)
+	fmt.Println(req.Token)
+
+	err := server.verifyToken(ctx, userId, req.Token)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	hashedPassword, err := util.HashPassword(req.NewPassword)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	_, err = server.store.UpdateUserPassword(ctx, db.UpdateUserPasswordParams{
+		ID:       userId,
+		Password: hashedPassword,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "password reset successfully"})
+}
+
+func (server *Server) verifyToken(ctx *gin.Context, userID int32, token string) error {
+	row, err := server.store.GetPasswordResetByToken(ctx, token)
+	if err != nil {
+		return err
+	}
+
+	if row.UserID != userID {
+		return util.ErrInvalidToken
+	}
+
+	if time.Now().After(row.ExpiresAt) {
+		return util.ErrExpiredToken
+	}
+
+	return nil
 }

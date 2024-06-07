@@ -1,17 +1,15 @@
 package api
 
 import (
-	"database/sql"
 	"strconv"
 	"time"
 
 	db "github.com/cihanalici/api/db/sqlc"
-	"github.com/cihanalici/api/util"
 	"github.com/gin-gonic/gin"
 )
 
 type productVariantRequest struct {
-	ProductID *int32 `json:"product_id"`
+	ProductID int32  `json:"product_id"`
 	Color     string `json:"color" binding:"required"`
 	Size      string `json:"size" binding:"required"`
 	Stock     int32  `json:"stock" binding:"required"`
@@ -20,7 +18,7 @@ type productVariantRequest struct {
 
 type productVariantResponse struct {
 	ID        int32     `json:"id"`
-	ProductID *int32    `json:"product_id"`
+	ProductID int32     `json:"product_id"`
 	Color     string    `json:"color"`
 	Size      string    `json:"size"`
 	Stock     int32     `json:"stock"`
@@ -30,14 +28,10 @@ type productVariantResponse struct {
 }
 
 func productVariantNotation(productVariant db.ProductVariant) productVariantResponse {
-	var productID *int32
-	if productVariant.ProductID.Valid {
-		productID = &productVariant.ProductID.Int32
-	}
 
 	return productVariantResponse{
 		ID:        productVariant.ID,
-		ProductID: productID,
+		ProductID: productVariant.ProductID,
 		Color:     productVariant.Color,
 		Size:      productVariant.Size,
 		Stock:     productVariant.Stock,
@@ -77,7 +71,7 @@ func (server *Server) createProductVariant(ctx *gin.Context) {
 	}
 
 	arg := db.CreateProductVariantParams{
-		ProductID: util.ToNullInt32(req.ProductID),
+		ProductID: req.ProductID,
 		Color:     req.Color,
 		Size:      req.Size,
 		Stock:     req.Stock,
@@ -197,11 +191,7 @@ func (server *Server) updateProductVariant(ctx *gin.Context) {
 		Size:      req.Size,
 		Stock:     req.Stock,
 		Price:     req.Price,
-		ProductID: sql.NullInt32{},
-	}
-
-	if req.ProductID != nil {
-		arg.ProductID = sql.NullInt32{Int32: *req.ProductID, Valid: true}
+		ProductID: req.ProductID,
 	}
 
 	variant, err = server.store.UpdateProductVariant(ctx, arg)

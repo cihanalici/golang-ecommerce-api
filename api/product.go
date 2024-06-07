@@ -1,7 +1,6 @@
 package api
 
 import (
-	"database/sql"
 	"time"
 
 	db "github.com/cihanalici/api/db/sqlc"
@@ -9,42 +8,33 @@ import (
 )
 
 type productRequest struct {
-	Name        string  `json:"name" binding:"required"`
-	Description *string `json:"description"` // Pointer type to allow nil value
-	Price       string  `json:"price" binding:"required"`
-	Stock       int32   `json:"stock" binding:"required"`
-	CategoryID  *int32  `json:"category_id"` // Pointer type to allow nil value
+	Name        string `json:"name" binding:"required"`
+	Description string `json:"description"` // Pointer type to allow nil value
+	Price       string `json:"price" binding:"required"`
+	Stock       int32  `json:"stock" binding:"required"`
+	CategoryID  int32  `json:"category_id"` // Pointer type to allow nil value
 }
 
 type productResponse struct {
 	ID          int32     `json:"id"`
 	Name        string    `json:"name"`
-	Description *string   `json:"description"` // Pointer type to allow nil value
+	Description string    `json:"description"` // Pointer type to allow nil value
 	Price       string    `json:"price"`
 	Stock       int32     `json:"stock"`
-	CategoryID  *int32    `json:"category_id"` // Pointer type to allow nil value
+	CategoryID  int32     `json:"category_id"` // Pointer type to allow nil value
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 func productNotation(product db.Product) productResponse {
-	var description *string
-	if product.Description.Valid {
-		description = &product.Description.String
-	}
-
-	var categoryID *int32
-	if product.CategoryID.Valid {
-		categoryID = &product.CategoryID.Int32
-	}
 
 	return productResponse{
 		ID:          product.ID,
 		Name:        product.Name,
-		Description: description,
+		Description: product.Description,
 		Price:       product.Price,
 		Stock:       product.Stock,
-		CategoryID:  categoryID,
+		CategoryID:  product.CategoryID,
 		CreatedAt:   product.CreatedAt,
 		UpdatedAt:   product.UpdatedAt,
 	}
@@ -79,22 +69,13 @@ func (server *Server) createProduct(ctx *gin.Context) {
 	}
 
 	// Handling null values for Description and CategoryID
-	description := sql.NullString{Valid: false}
-	if req.Description != nil {
-		description = sql.NullString{String: *req.Description, Valid: true}
-	}
-
-	categoryID := sql.NullInt32{Valid: false}
-	if req.CategoryID != nil {
-		categoryID = sql.NullInt32{Int32: *req.CategoryID, Valid: true}
-	}
 
 	arg := db.CreateProductParams{
 		Name:        req.Name,
-		Description: description,
+		Description: req.Description,
 		Price:       req.Price,
 		Stock:       req.Stock,
-		CategoryID:  categoryID,
+		CategoryID:  req.CategoryID,
 	}
 
 	product, err := server.store.CreateProduct(ctx, arg)
@@ -183,12 +164,12 @@ func (server *Server) getProducts(ctx *gin.Context) {
 // @Router /products/{id} [put]
 
 type updateProductRequest struct {
-	ID          int32          `uri:"id" binding:"required,min=1"`
-	Name        string         `json:"name"`
-	Description sql.NullString `json:"description"`
-	Price       string         `json:"price"`
-	Stock       int32          `json:"stock"`
-	CategoryID  sql.NullInt32  `json:"category_id"`
+	ID          int32  `uri:"id" binding:"required,min=1"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Price       string `json:"price"`
+	Stock       int32  `json:"stock"`
+	CategoryID  int32  `json:"category_id"`
 }
 
 func (server *Server) updateProduct(ctx *gin.Context) {
@@ -199,23 +180,13 @@ func (server *Server) updateProduct(ctx *gin.Context) {
 		return
 	}
 
-	description := sql.NullString{Valid: false}
-	if req.Description.Valid {
-		description = sql.NullString{String: req.Description.String, Valid: true}
-	}
-
-	categoryID := sql.NullInt32{Valid: false}
-	if req.CategoryID.Valid {
-		categoryID = sql.NullInt32{Int32: req.CategoryID.Int32, Valid: true}
-	}
-
 	arg := db.UpdateProductParams{
 		ID:          req.ID,
 		Name:        req.Name,
-		Description: description,
+		Description: req.Description,
 		Price:       req.Price,
 		Stock:       req.Stock,
-		CategoryID:  categoryID,
+		CategoryID:  req.CategoryID,
 	}
 
 	product, err := server.store.UpdateProduct(ctx, arg)

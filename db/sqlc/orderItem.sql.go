@@ -7,7 +7,6 @@ package sqlc
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createOrderItem = `-- name: CreateOrderItem :one
@@ -17,10 +16,10 @@ RETURNING id, order_id, product_variant_id, quantity, price, created_at, updated
 `
 
 type CreateOrderItemParams struct {
-	OrderID          sql.NullInt32 `json:"order_id"`
-	ProductVariantID sql.NullInt32 `json:"product_variant_id"`
-	Quantity         int32         `json:"quantity"`
-	Price            string        `json:"price"`
+	OrderID          int32  `json:"order_id"`
+	ProductVariantID int32  `json:"product_variant_id"`
+	Quantity         int32  `json:"quantity"`
+	Price            string `json:"price"`
 }
 
 func (q *Queries) CreateOrderItem(ctx context.Context, arg CreateOrderItemParams) (OrderItem, error) {
@@ -84,9 +83,9 @@ OFFSET $3
 `
 
 type GetOrderItemsByOrderIdParams struct {
-	OrderID sql.NullInt32 `json:"order_id"`
-	Limit   int32         `json:"limit"`
-	Offset  int32         `json:"offset"`
+	OrderID int32 `json:"order_id"`
+	Limit   int32 `json:"limit"`
+	Offset  int32 `json:"offset"`
 }
 
 func (q *Queries) GetOrderItemsByOrderId(ctx context.Context, arg GetOrderItemsByOrderIdParams) ([]OrderItem, error) {
@@ -172,11 +171,11 @@ RETURNING id, order_id, product_variant_id, quantity, price, created_at, updated
 `
 
 type UpdateOrderItemParams struct {
-	ID               int32         `json:"id"`
-	OrderID          sql.NullInt32 `json:"order_id"`
-	ProductVariantID sql.NullInt32 `json:"product_variant_id"`
-	Quantity         int32         `json:"quantity"`
-	Price            string        `json:"price"`
+	ID               int32  `json:"id"`
+	OrderID          int32  `json:"order_id"`
+	ProductVariantID int32  `json:"product_variant_id"`
+	Quantity         int32  `json:"quantity"`
+	Price            string `json:"price"`
 }
 
 func (q *Queries) UpdateOrderItem(ctx context.Context, arg UpdateOrderItemParams) (OrderItem, error) {

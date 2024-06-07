@@ -4,7 +4,7 @@ CREATE TABLE "users" (
   "email" VARCHAR(255) UNIQUE NOT NULL,
   "password" VARCHAR(255) NOT NULL,
   "role" VARCHAR(50) NOT NULL,
-  "addresses" JSONB NOT NULL DEFAULT '{}',
+  "addresses" JSONB NOT NULL DEFAULT '{}'::jsonb,
   "created_at" timestamptz NOT NULL DEFAULT (now()),
   "updated_at" timestamptz NOT NULL DEFAULT (now())
 );
@@ -12,17 +12,17 @@ CREATE TABLE "users" (
 CREATE TABLE "products" (
   "id" SERIAL PRIMARY KEY,
   "name" VARCHAR(255) NOT NULL,
-  "description" TEXT,
+  "description" varchar(255) NOT NULL,
   "price" DECIMAL(10,2) NOT NULL,
   "stock" INT NOT NULL,
-  "category_id" INT,
+  "category_id" INT NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT (now()),
   "updated_at" timestamptz NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "product_variants" (
   "id" SERIAL PRIMARY KEY,
-  "product_id" INT,
+  "product_id" INT NOT NULL,
   "color" VARCHAR(50) NOT NULL,
   "size" VARCHAR(10) NOT NULL,
   "stock" INT NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE "categories" (
 
 CREATE TABLE "orders" (
   "id" SERIAL PRIMARY KEY,
-  "user_id" INT,
+  "user_id" INT NOT NULL,
   "total_amount" DECIMAL(10,2) NOT NULL,
   "status" VARCHAR(50) NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT (now()),
@@ -50,8 +50,8 @@ CREATE TABLE "orders" (
 
 CREATE TABLE "order_items" (
   "id" SERIAL PRIMARY KEY,
-  "order_id" INT,
-  "product_variant_id" INT,
+  "order_id" INT NOT NULL,
+  "product_variant_id" INT NOT NULL,
   "quantity" INT NOT NULL,
   "price" DECIMAL(10,2) NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT (now()),
@@ -60,25 +60,25 @@ CREATE TABLE "order_items" (
 
 CREATE TABLE "reviews" (
   "id" SERIAL PRIMARY KEY,
-  "product_id" INT,
-  "user_id" INT,
+  "product_id" INT NOT NULL,
+  "user_id" INT NOT NULL,
   "rating" INT NOT NULL,
-  "comment" TEXT,
+  "comment" TEXT NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT (now()),
   "updated_at" timestamptz NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "wishlist" (
   "id" SERIAL PRIMARY KEY,
-  "user_id" INT,
-  "product_id" INT,
+  "user_id" INT NOT NULL,
+  "product_id" INT NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT (now()),
   "updated_at" timestamptz NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "password_resets" (
   "id" SERIAL PRIMARY KEY,
-  "user_id" INT,
+  "user_id" INT NOT NULL,
   "reset_token" VARCHAR(255) NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT (now()),
   "expires_at" timestamptz NOT NULL
@@ -86,8 +86,8 @@ CREATE TABLE "password_resets" (
 
 CREATE TABLE "sales" (
   "id" SERIAL PRIMARY KEY,
-  "month" INT,
-  "year" INT,
+  "month" INT NOT NULL,
+  "year" INT NOT NULL,
   "total_sales" DECIMAL(10,2),
   "created_at" timestamptz NOT NULL DEFAULT (now()),
   "updated_at" timestamptz NOT NULL DEFAULT (now())

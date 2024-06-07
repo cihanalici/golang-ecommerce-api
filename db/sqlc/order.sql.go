@@ -7,7 +7,7 @@ package sqlc
 
 import (
 	"context"
-	"database/sql"
+	"time"
 )
 
 const createOrder = `-- name: CreateOrder :one
@@ -17,9 +17,9 @@ RETURNING id, user_id, total_amount, status, created_at, updated_at
 `
 
 type CreateOrderParams struct {
-	UserID      sql.NullInt32 `json:"user_id"`
-	TotalAmount string        `json:"total_amount"`
-	Status      string        `json:"status"`
+	UserID      int32  `json:"user_id"`
+	TotalAmount string `json:"total_amount"`
+	Status      string `json:"status"`
 }
 
 func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order, error) {
@@ -44,6 +44,42 @@ WHERE id = $1
 func (q *Queries) DeleteOrder(ctx context.Context, id int32) error {
 	_, err := q.db.ExecContext(ctx, deleteOrder, id)
 	return err
+}
+
+const getMonthlySales = `-- name: GetMonthlySales :many
+SELECT EXTRACT(MONTH FROM created_at) AS month, SUM(total_amount) AS total_sales
+FROM orders
+WHERE EXTRACT(YEAR FROM created_at) = $1
+GROUP BY month
+ORDER BY month
+`
+
+type GetMonthlySalesRow struct {
+	Month      string `json:"month"`
+	TotalSales int64  `json:"total_sales"`
+}
+
+func (q *Queries) GetMonthlySales(ctx context.Context, createdAt time.Time) ([]GetMonthlySalesRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthlySales, createdAt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetMonthlySalesRow{}
+	for rows.Next() {
+		var i GetMonthlySalesRow
+		if err := rows.Scan(&i.Month, &i.TotalSales); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getOrderById = `-- name: GetOrderById :one
@@ -76,9 +112,9 @@ OFFSET $3
 `
 
 type GetOrdersByUserIdParams struct {
-	UserID sql.NullInt32 `json:"user_id"`
-	Limit  int32         `json:"limit"`
-	Offset int32         `json:"offset"`
+	UserID int32 `json:"user_id"`
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
 }
 
 func (q *Queries) GetOrdersByUserId(ctx context.Context, arg GetOrdersByUserIdParams) ([]Order, error) {
@@ -162,10 +198,10 @@ RETURNING id, user_id, total_amount, status, created_at, updated_at
 `
 
 type UpdateOrderParams struct {
-	ID          int32         `json:"id"`
-	UserID      sql.NullInt32 `json:"user_id"`
-	TotalAmount string        `json:"total_amount"`
-	Status      string        `json:"status"`
+	ID          int32  `json:"id"`
+	UserID      int32  `json:"user_id"`
+	TotalAmount string `json:"total_amount"`
+	Status      string `json:"status"`
 }
 
 func (q *Queries) UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order, error) {

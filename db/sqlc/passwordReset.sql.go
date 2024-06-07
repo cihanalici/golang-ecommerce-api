@@ -7,7 +7,6 @@ package sqlc
 
 import (
 	"context"
-	"database/sql"
 	"time"
 )
 
@@ -18,17 +17,17 @@ RETURNING id, user_id, reset_token, expires_at, created_at
 `
 
 type CreatePasswordResetParams struct {
-	UserID     sql.NullInt32 `json:"user_id"`
-	ResetToken string        `json:"reset_token"`
-	ExpiresAt  time.Time     `json:"expires_at"`
+	UserID     int32     `json:"user_id"`
+	ResetToken string    `json:"reset_token"`
+	ExpiresAt  time.Time `json:"expires_at"`
 }
 
 type CreatePasswordResetRow struct {
-	ID         int32         `json:"id"`
-	UserID     sql.NullInt32 `json:"user_id"`
-	ResetToken string        `json:"reset_token"`
-	ExpiresAt  time.Time     `json:"expires_at"`
-	CreatedAt  time.Time     `json:"created_at"`
+	ID         int32     `json:"id"`
+	UserID     int32     `json:"user_id"`
+	ResetToken string    `json:"reset_token"`
+	ExpiresAt  time.Time `json:"expires_at"`
+	CreatedAt  time.Time `json:"created_at"`
 }
 
 func (q *Queries) CreatePasswordReset(ctx context.Context, arg CreatePasswordResetParams) (CreatePasswordResetRow, error) {
@@ -90,11 +89,11 @@ WHERE reset_token = $1
 `
 
 type GetPasswordResetByTokenRow struct {
-	ID         int32         `json:"id"`
-	UserID     sql.NullInt32 `json:"user_id"`
-	ResetToken string        `json:"reset_token"`
-	ExpiresAt  time.Time     `json:"expires_at"`
-	CreatedAt  time.Time     `json:"created_at"`
+	ID         int32     `json:"id"`
+	UserID     int32     `json:"user_id"`
+	ResetToken string    `json:"reset_token"`
+	ExpiresAt  time.Time `json:"expires_at"`
+	CreatedAt  time.Time `json:"created_at"`
 }
 
 func (q *Queries) GetPasswordResetByToken(ctx context.Context, resetToken string) (GetPasswordResetByTokenRow, error) {
@@ -117,14 +116,14 @@ WHERE user_id = $1
 `
 
 type GetPasswordResetByUserIdRow struct {
-	ID         int32         `json:"id"`
-	UserID     sql.NullInt32 `json:"user_id"`
-	ResetToken string        `json:"reset_token"`
-	ExpiresAt  time.Time     `json:"expires_at"`
-	CreatedAt  time.Time     `json:"created_at"`
+	ID         int32     `json:"id"`
+	UserID     int32     `json:"user_id"`
+	ResetToken string    `json:"reset_token"`
+	ExpiresAt  time.Time `json:"expires_at"`
+	CreatedAt  time.Time `json:"created_at"`
 }
 
-func (q *Queries) GetPasswordResetByUserId(ctx context.Context, userID sql.NullInt32) (GetPasswordResetByUserIdRow, error) {
+func (q *Queries) GetPasswordResetByUserId(ctx context.Context, userID int32) (GetPasswordResetByUserIdRow, error) {
 	row := q.db.QueryRowContext(ctx, getPasswordResetByUserId, userID)
 	var i GetPasswordResetByUserIdRow
 	err := row.Scan(
@@ -144,16 +143,16 @@ WHERE user_id = $1 AND reset_token = $2
 `
 
 type GetPasswordResetByUserIdAndTokenParams struct {
-	UserID     sql.NullInt32 `json:"user_id"`
-	ResetToken string        `json:"reset_token"`
+	UserID     int32  `json:"user_id"`
+	ResetToken string `json:"reset_token"`
 }
 
 type GetPasswordResetByUserIdAndTokenRow struct {
-	ID         int32         `json:"id"`
-	UserID     sql.NullInt32 `json:"user_id"`
-	ResetToken string        `json:"reset_token"`
-	ExpiresAt  time.Time     `json:"expires_at"`
-	CreatedAt  time.Time     `json:"created_at"`
+	ID         int32     `json:"id"`
+	UserID     int32     `json:"user_id"`
+	ResetToken string    `json:"reset_token"`
+	ExpiresAt  time.Time `json:"expires_at"`
+	CreatedAt  time.Time `json:"created_at"`
 }
 
 func (q *Queries) GetPasswordResetByUserIdAndToken(ctx context.Context, arg GetPasswordResetByUserIdAndTokenParams) (GetPasswordResetByUserIdAndTokenRow, error) {

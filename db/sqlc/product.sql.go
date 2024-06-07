@@ -7,7 +7,6 @@ package sqlc
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createProduct = `-- name: CreateProduct :one
@@ -17,11 +16,11 @@ RETURNING id, name, description, price, stock, category_id, created_at, updated_
 `
 
 type CreateProductParams struct {
-	Name        string         `json:"name"`
-	Description sql.NullString `json:"description"`
-	Price       string         `json:"price"`
-	Stock       int32          `json:"stock"`
-	CategoryID  sql.NullInt32  `json:"category_id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Price       string `json:"price"`
+	Stock       int32  `json:"stock"`
+	CategoryID  int32  `json:"category_id"`
 }
 
 func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (Product, error) {
@@ -131,12 +130,12 @@ RETURNING id, name, description, price, stock, category_id, created_at, updated_
 `
 
 type UpdateProductParams struct {
-	ID          int32          `json:"id"`
-	Name        string         `json:"name"`
-	Description sql.NullString `json:"description"`
-	Price       string         `json:"price"`
-	Stock       int32          `json:"stock"`
-	CategoryID  sql.NullInt32  `json:"category_id"`
+	ID          int32  `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Price       string `json:"price"`
+	Stock       int32  `json:"stock"`
+	CategoryID  int32  `json:"category_id"`
 }
 
 func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) (Product, error) {

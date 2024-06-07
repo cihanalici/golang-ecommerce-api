@@ -29,3 +29,9 @@ RETURNING id, name, email, role, password, addresses, created_at, updated_at;
 -- name: DeleteUser :exec
 DELETE FROM users
 WHERE id = $1;
+
+-- name: UpdateUserPassword :one
+UPDATE users
+SET password = $1, updated_at = CURRENT_TIMESTAMP
+WHERE id = $2
+RETURNING id, name, email, role, password, addresses, created_at, updated_at;

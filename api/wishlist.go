@@ -5,38 +5,28 @@ import (
 	"time"
 
 	db "github.com/cihanalici/api/db/sqlc"
-	"github.com/cihanalici/api/util"
 	"github.com/gin-gonic/gin"
 )
 
 type WishlistRequest struct {
-	UserID    *int32 `json:"user_id"`
-	ProductID *int32 `json:"product_id"`
+	UserID    int32 `json:"user_id"`
+	ProductID int32 `json:"product_id"`
 }
 
 type WishlistResponse struct {
 	ID        int32     `json:"id"`
-	UserID    *int32    `json:"user_id"`
-	ProductID *int32    `json:"product_id"`
+	UserID    int32     `json:"user_id"`
+	ProductID int32     `json:"product_id"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
 func WishlistNotation(wishlist db.Wishlist) WishlistResponse {
-	var userID *int32
-	if wishlist.UserID.Valid {
-		userID = &wishlist.UserID.Int32
-	}
-
-	var productID *int32
-	if wishlist.ProductID.Valid {
-		productID = &wishlist.ProductID.Int32
-	}
 
 	return WishlistResponse{
 		ID:        wishlist.ID,
-		UserID:    userID,
-		ProductID: productID,
+		UserID:    wishlist.UserID,
+		ProductID: wishlist.ProductID,
 		CreatedAt: wishlist.CreatedAt,
 		UpdatedAt: wishlist.UpdatedAt,
 	}
@@ -73,8 +63,8 @@ func (server *Server) createWishlist(ctx *gin.Context) {
 	userIDInt32, _ := userId.(int32)
 
 	arg := db.CreateWishlistItemParams{
-		UserID:    util.ToInt32ToNullInt32(userIDInt32),
-		ProductID: util.ToNullInt32(req.ProductID),
+		UserID:    userIDInt32,
+		ProductID: req.ProductID,
 	}
 
 	wishlist, err := server.store.CreateWishlistItem(ctx, arg)
@@ -176,7 +166,7 @@ func (server *Server) getWishlistByUser(ctx *gin.Context) {
 	userId, _ := userIdByToken.(int32)
 
 	arg := db.GetWishlistItemsByUserIdParams{
-		UserID: util.ToInt32ToNullInt32(userId),
+		UserID: userId,
 		Limit:  req.PageSize,
 		Offset: (req.PageID - 1) * req.PageSize,
 	}

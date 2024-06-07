@@ -9,11 +9,13 @@ import (
 // Config is the configuration for the application
 // It should be loaded from a file or other sources
 type Config struct {
-	DBDriver            string        `mapstructure:"DB_DRIVER"`
-	DBSource            string        `mapstructure:"DB_SOURCE"`
-	ServerAddress       string        `mapstructure:"SERVER_ADDRESS"`
-	TokenSymmetricKey   string        `mapstructure:"TOKEN_SYMMETRIC_KEY"`
-	AccessTokenDuration time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
+	DBDriver                 string        `mapstructure:"DB_DRIVER"`
+	DBSource                 string        `mapstructure:"DB_SOURCE"`
+	ServerAddress            string        `mapstructure:"SERVER_ADDRESS"`
+	TokenSymmetricKey        string        `mapstructure:"TOKEN_SYMMETRIC_KEY"`
+	AccessTokenDuration      time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
+	ResetPasswordDuration    time.Duration `mapstructure:"RESET_PASSWORD_DURATION"`
+	ResetPasswordRedirectURL string        `mapstructure:"RESET_PASSWORD_REDIRECT_URL"`
 }
 
 func LoadConfig(path string) (config Config, err error) {

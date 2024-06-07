@@ -17,8 +17,8 @@ RETURNING id, month, year, total_sales, created_at, updated_at
 `
 
 type CreateSaleParams struct {
-	Month      sql.NullInt32  `json:"month"`
-	Year       sql.NullInt32  `json:"year"`
+	Month      int32          `json:"month"`
+	Year       int32          `json:"year"`
 	TotalSales sql.NullString `json:"total_sales"`
 }
 
@@ -118,8 +118,8 @@ RETURNING id, month, year, total_sales, created_at, updated_at
 
 type UpdateSaleParams struct {
 	ID         int32          `json:"id"`
-	Month      sql.NullInt32  `json:"month"`
-	Year       sql.NullInt32  `json:"year"`
+	Month      int32          `json:"month"`
+	Year       int32          `json:"year"`
 	TotalSales sql.NullString `json:"total_sales"`
 }
 

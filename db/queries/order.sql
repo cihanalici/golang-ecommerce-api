@@ -32,3 +32,10 @@ WHERE user_id = $1
 ORDER BY id
 LIMIT $2
 OFFSET $3;
+
+-- name: GetMonthlySales :many
+SELECT EXTRACT(MONTH FROM created_at) AS month, SUM(total_amount) AS total_sales
+FROM orders
+WHERE EXTRACT(YEAR FROM created_at) = $1
+GROUP BY month
+ORDER BY month;

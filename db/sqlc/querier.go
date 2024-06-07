@@ -6,7 +6,7 @@ package sqlc
 
 import (
 	"context"
-	"database/sql"
+	"time"
 )
 
 type Querier interface {
@@ -32,13 +32,14 @@ type Querier interface {
 	DeleteUser(ctx context.Context, id int32) error
 	DeleteWishlistItem(ctx context.Context, id int32) error
 	GetCategoryById(ctx context.Context, id int32) (Category, error)
+	GetMonthlySales(ctx context.Context, createdAt time.Time) ([]GetMonthlySalesRow, error)
 	GetOrderById(ctx context.Context, id int32) (Order, error)
 	GetOrderItemById(ctx context.Context, id int32) (OrderItem, error)
 	GetOrderItemsByOrderId(ctx context.Context, arg GetOrderItemsByOrderIdParams) ([]OrderItem, error)
 	GetOrdersByUserId(ctx context.Context, arg GetOrdersByUserIdParams) ([]Order, error)
 	GetPasswordResetByID(ctx context.Context, id int32) (PasswordReset, error)
 	GetPasswordResetByToken(ctx context.Context, resetToken string) (GetPasswordResetByTokenRow, error)
-	GetPasswordResetByUserId(ctx context.Context, userID sql.NullInt32) (GetPasswordResetByUserIdRow, error)
+	GetPasswordResetByUserId(ctx context.Context, userID int32) (GetPasswordResetByUserIdRow, error)
 	GetPasswordResetByUserIdAndToken(ctx context.Context, arg GetPasswordResetByUserIdAndTokenParams) (GetPasswordResetByUserIdAndTokenRow, error)
 	GetProductById(ctx context.Context, id int32) (Product, error)
 	GetProductVariantById(ctx context.Context, id int32) (ProductVariant, error)
@@ -66,6 +67,7 @@ type Querier interface {
 	UpdateReview(ctx context.Context, arg UpdateReviewParams) (Review, error)
 	UpdateSale(ctx context.Context, arg UpdateSaleParams) (Sale, error)
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
+	UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) (User, error)
 	UpdateWishlistItem(ctx context.Context, arg UpdateWishlistItemParams) (Wishlist, error)
 }
 

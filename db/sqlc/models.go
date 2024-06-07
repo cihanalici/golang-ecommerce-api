@@ -19,68 +19,68 @@ type Category struct {
 }
 
 type Order struct {
-	ID          int32         `json:"id"`
-	UserID      sql.NullInt32 `json:"user_id"`
-	TotalAmount string        `json:"total_amount"`
-	Status      string        `json:"status"`
-	CreatedAt   time.Time     `json:"created_at"`
-	UpdatedAt   time.Time     `json:"updated_at"`
+	ID          int32     `json:"id"`
+	UserID      int32     `json:"user_id"`
+	TotalAmount string    `json:"total_amount"`
+	Status      string    `json:"status"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 type OrderItem struct {
-	ID               int32         `json:"id"`
-	OrderID          sql.NullInt32 `json:"order_id"`
-	ProductVariantID sql.NullInt32 `json:"product_variant_id"`
-	Quantity         int32         `json:"quantity"`
-	Price            string        `json:"price"`
-	CreatedAt        time.Time     `json:"created_at"`
-	UpdatedAt        time.Time     `json:"updated_at"`
+	ID               int32     `json:"id"`
+	OrderID          int32     `json:"order_id"`
+	ProductVariantID int32     `json:"product_variant_id"`
+	Quantity         int32     `json:"quantity"`
+	Price            string    `json:"price"`
+	CreatedAt        time.Time `json:"created_at"`
+	UpdatedAt        time.Time `json:"updated_at"`
 }
 
 type PasswordReset struct {
-	ID         int32         `json:"id"`
-	UserID     sql.NullInt32 `json:"user_id"`
-	ResetToken string        `json:"reset_token"`
-	CreatedAt  time.Time     `json:"created_at"`
-	ExpiresAt  time.Time     `json:"expires_at"`
+	ID         int32     `json:"id"`
+	UserID     int32     `json:"user_id"`
+	ResetToken string    `json:"reset_token"`
+	CreatedAt  time.Time `json:"created_at"`
+	ExpiresAt  time.Time `json:"expires_at"`
 }
 
 type Product struct {
-	ID          int32          `json:"id"`
-	Name        string         `json:"name"`
-	Description sql.NullString `json:"description"`
-	Price       string         `json:"price"`
-	Stock       int32          `json:"stock"`
-	CategoryID  sql.NullInt32  `json:"category_id"`
-	CreatedAt   time.Time      `json:"created_at"`
-	UpdatedAt   time.Time      `json:"updated_at"`
+	ID          int32     `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	Price       string    `json:"price"`
+	Stock       int32     `json:"stock"`
+	CategoryID  int32     `json:"category_id"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 type ProductVariant struct {
-	ID        int32         `json:"id"`
-	ProductID sql.NullInt32 `json:"product_id"`
-	Color     string        `json:"color"`
-	Size      string        `json:"size"`
-	Stock     int32         `json:"stock"`
-	Price     string        `json:"price"`
-	CreatedAt time.Time     `json:"created_at"`
-	UpdatedAt time.Time     `json:"updated_at"`
+	ID        int32     `json:"id"`
+	ProductID int32     `json:"product_id"`
+	Color     string    `json:"color"`
+	Size      string    `json:"size"`
+	Stock     int32     `json:"stock"`
+	Price     string    `json:"price"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type Review struct {
-	ID        int32          `json:"id"`
-	ProductID sql.NullInt32  `json:"product_id"`
-	UserID    sql.NullInt32  `json:"user_id"`
-	Rating    int32          `json:"rating"`
-	Comment   sql.NullString `json:"comment"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
+	ID        int32     `json:"id"`
+	ProductID int32     `json:"product_id"`
+	UserID    int32     `json:"user_id"`
+	Rating    int32     `json:"rating"`
+	Comment   string    `json:"comment"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type Sale struct {
 	ID         int32          `json:"id"`
-	Month      sql.NullInt32  `json:"month"`
-	Year       sql.NullInt32  `json:"year"`
+	Month      int32          `json:"month"`
+	Year       int32          `json:"year"`
 	TotalSales sql.NullString `json:"total_sales"`
 	CreatedAt  time.Time      `json:"created_at"`
 	UpdatedAt  time.Time      `json:"updated_at"`
@@ -98,9 +98,9 @@ type User struct {
 }
 
 type Wishlist struct {
-	ID        int32         `json:"id"`
-	UserID    sql.NullInt32 `json:"user_id"`
-	ProductID sql.NullInt32 `json:"product_id"`
-	CreatedAt time.Time     `json:"created_at"`
-	UpdatedAt time.Time     `json:"updated_at"`
+	ID        int32     `json:"id"`
+	UserID    int32     `json:"user_id"`
+	ProductID int32     `json:"product_id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }

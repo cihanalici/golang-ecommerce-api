@@ -7,7 +7,6 @@ package sqlc
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createReview = `-- name: CreateReview :one
@@ -17,10 +16,10 @@ RETURNING id, product_id, user_id, rating, comment, created_at, updated_at
 `
 
 type CreateReviewParams struct {
-	ProductID sql.NullInt32  `json:"product_id"`
-	UserID    sql.NullInt32  `json:"user_id"`
-	Rating    int32          `json:"rating"`
-	Comment   sql.NullString `json:"comment"`
+	ProductID int32  `json:"product_id"`
+	UserID    int32  `json:"user_id"`
+	Rating    int32  `json:"rating"`
+	Comment   string `json:"comment"`
 }
 
 func (q *Queries) CreateReview(ctx context.Context, arg CreateReviewParams) (Review, error) {
@@ -84,9 +83,9 @@ OFFSET $3
 `
 
 type GetReviewsByProductIdParams struct {
-	ProductID sql.NullInt32 `json:"product_id"`
-	Limit     int32         `json:"limit"`
-	Offset    int32         `json:"offset"`
+	ProductID int32 `json:"product_id"`
+	Limit     int32 `json:"limit"`
+	Offset    int32 `json:"offset"`
 }
 
 func (q *Queries) GetReviewsByProductId(ctx context.Context, arg GetReviewsByProductIdParams) ([]Review, error) {
@@ -172,11 +171,11 @@ RETURNING id, product_id, user_id, rating, comment, created_at, updated_at
 `
 
 type UpdateReviewParams struct {
-	ID        int32          `json:"id"`
-	ProductID sql.NullInt32  `json:"product_id"`
-	UserID    sql.NullInt32  `json:"user_id"`
-	Rating    int32          `json:"rating"`
-	Comment   sql.NullString `json:"comment"`
+	ID        int32  `json:"id"`
+	ProductID int32  `json:"product_id"`
+	UserID    int32  `json:"user_id"`
+	Rating    int32  `json:"rating"`
+	Comment   string `json:"comment"`
 }
 
 func (q *Queries) UpdateReview(ctx context.Context, arg UpdateReviewParams) (Review, error) {

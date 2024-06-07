@@ -1,24 +1,30 @@
 package api
 
 import (
-	"database/sql"
+	"fmt"
 	"strconv"
 	"time"
 
 	db "github.com/cihanalici/api/db/sqlc"
-	"github.com/cihanalici/api/util"
 	"github.com/gin-gonic/gin"
 )
 
 type orderRequest struct {
-	UserID      *int32 `json:"user_id" binding:"required"`
-	TotalAmount string `json:"total_amount" binding:"required"`
-	Status      string `json:"status" binding:"required"`
+	UserID      int32               `json:"user_id" binding:"required"`
+	TotalAmount string              `json:"total_amount" binding:"required"`
+	Status      string              `json:"status" binding:"required"`
+	Items       []orderItemsRequest `json:"items" binding:"required"`
+}
+
+type orderItemsRequest struct {
+	ProductVariantID int32  `json:"product_variant_id"`
+	Quantity         int32  `json:"quantity"`
+	Price            string `json:"price"`
 }
 
 type orderResponse struct {
 	ID          int32     `json:"id"`
-	UserID      *int32    `json:"user_id"`
+	UserID      int32     `json:"user_id"`
 	TotalAmount string    `json:"total_amount"`
 	Status      string    `json:"status"`
 	CreatedAt   time.Time `json:"created_at"`
@@ -26,14 +32,10 @@ type orderResponse struct {
 }
 
 func orderNotation(order db.Order) orderResponse {
-	var userID *int32
-	if order.UserID.Valid {
-		userID = &order.UserID.Int32
-	}
 
 	return orderResponse{
 		ID:          order.ID,
-		UserID:      userID,
+		UserID:      order.UserID,
 		TotalAmount: order.TotalAmount,
 		Status:      order.Status,
 		CreatedAt:   order.CreatedAt,
@@ -69,7 +71,7 @@ func (server *Server) createOrder(ctx *gin.Context) {
 	}
 
 	arg := db.CreateOrderParams{
-		UserID:      sql.NullInt32{Int32: *req.UserID, Valid: true},
+		UserID:      req.UserID,
 		TotalAmount: req.TotalAmount,
 		Status:      req.Status,
 	}
@@ -78,6 +80,26 @@ func (server *Server) createOrder(ctx *gin.Context) {
 	if err != nil {
 		ctx.JSON(500, errorResponse(err))
 		return
+	}
+
+	fmt.Println(req.Items)
+
+	// create order items
+	for _, item := range req.Items {
+		itemArg := db.CreateOrderItemParams{
+			OrderID:          order.ID,
+			ProductVariantID: item.ProductVariantID,
+			Quantity:         item.Quantity,
+			Price:            item.Price,
+		}
+
+		orderItem, err := server.store.CreateOrderItem(ctx, itemArg)
+		fmt.Println(orderItem)
+
+		if err != nil {
+			ctx.JSON(500, errorResponse(err))
+			return
+		}
 	}
 
 	ctx.JSON(200, orderNotation(order))
@@ -160,7 +182,7 @@ func (server *Server) ListOrders(ctx *gin.Context) {
 
 type updateOrderRequest struct {
 	ID          int32  `json:"id"`
-	UserID      *int32 `json:"user_id"`
+	UserID      int32  `json:"user_id"`
 	TotalAmount string `json:"total_amount"`
 	Status      string `json:"status"`
 }
@@ -189,16 +211,11 @@ func (server *Server) updateOrder(ctx *gin.Context) {
 		return
 	}
 
-	userId := sql.NullInt32{Valid: false}
-	if req.UserID != nil {
-		userId = sql.NullInt32{Int32: *req.UserID, Valid: true}
-	}
-
 	arg := db.UpdateOrderParams{
 		ID:          int32(orderId),
 		TotalAmount: req.TotalAmount,
 		Status:      req.Status,
-		UserID:      userId,
+		UserID:      req.UserID,
 	}
 
 	order, err = server.store.UpdateOrder(ctx, arg)
@@ -261,7 +278,7 @@ func (server *Server) getOrdersByUserId(ctx *gin.Context) {
 	userId, _ := userIdByToken.(int32)
 
 	arg := db.GetOrdersByUserIdParams{
-		UserID: util.ToInt32ToNullInt32(userId),
+		UserID: userId,
 		Limit:  req.PageSize,
 		Offset: (req.PageID - 1) * req.PageSize,
 	}
@@ -273,4 +290,25 @@ func (server *Server) getOrdersByUserId(ctx *gin.Context) {
 	}
 
 	ctx.JSON(200, ordersNotation(orders))
+}
+
+// GetMonthlySales godoc
+// @Summary Get monthly revenue
+// @Tags orders
+// @Description get monthly revenue
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} monthlyRevenueResponse
+
+func (server *Server) getMonthlySales(ctx *gin.Context) {
+	year := time.Now().Year()
+	startOfYear := time.Date(year, time.January, 1, 0, 0, 0, 0, time.UTC)
+
+	monthlySales, err := server.store.GetMonthlySales(ctx, startOfYear)
+	if err != nil {
+		ctx.JSON(500, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(200, monthlySales)
 }

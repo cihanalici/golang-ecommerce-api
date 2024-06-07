@@ -7,7 +7,6 @@ package sqlc
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createWishlistItem = `-- name: CreateWishlistItem :one
@@ -17,8 +16,8 @@ RETURNING id, user_id, product_id, created_at, updated_at
 `
 
 type CreateWishlistItemParams struct {
-	UserID    sql.NullInt32 `json:"user_id"`
-	ProductID sql.NullInt32 `json:"product_id"`
+	UserID    int32 `json:"user_id"`
+	ProductID int32 `json:"product_id"`
 }
 
 func (q *Queries) CreateWishlistItem(ctx context.Context, arg CreateWishlistItemParams) (Wishlist, error) {
@@ -73,9 +72,9 @@ OFFSET $3
 `
 
 type GetWishlistItemsByUserIdParams struct {
-	UserID sql.NullInt32 `json:"user_id"`
-	Limit  int32         `json:"limit"`
-	Offset int32         `json:"offset"`
+	UserID int32 `json:"user_id"`
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
 }
 
 func (q *Queries) GetWishlistItemsByUserId(ctx context.Context, arg GetWishlistItemsByUserIdParams) ([]Wishlist, error) {
@@ -157,9 +156,9 @@ RETURNING id, user_id, product_id, created_at, updated_at
 `
 
 type UpdateWishlistItemParams struct {
-	ID        int32         `json:"id"`
-	UserID    sql.NullInt32 `json:"user_id"`
-	ProductID sql.NullInt32 `json:"product_id"`
+	ID        int32 `json:"id"`
+	UserID    int32 `json:"user_id"`
+	ProductID int32 `json:"product_id"`
 }
 
 func (q *Queries) UpdateWishlistItem(ctx context.Context, arg UpdateWishlistItemParams) (Wishlist, error) {

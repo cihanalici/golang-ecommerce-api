@@ -31,5 +31,7 @@ migratedown1:
 mock:
 	mockgen -package mockdb -destination db/mock/store.go github.com/cihanalici/api/db/sqlc Store
 
+mailHog:
+	docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
 
-.PHONY: server test sqlc postgres createdb dropdb migrateup migrateup1 migratedown migratedown1 mock
+.PHONY: server test sqlc postgres createdb dropdb migrateup migrateup1 migratedown migratedown1 mock mailHog
